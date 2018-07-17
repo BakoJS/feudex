@@ -1,36 +1,53 @@
-<div class="jumbotron">
-  <h2><%= gettext "Welcome to %{name}!", name: "Phoenix" %></h2>
-  <p class="lead">A productive web framework that<br />does not compromise speed and maintainability.</p>
-</div>
+<div id="feud_admin" class="section categories">
+  <div class="container">
+    <div class="row">
+      <div class="four columns"><h3 class="section-heading">Developer Feud</h3></div>
+      <div class="eight columns">
+        <button style="margin-right:6px" v-for="u in userList" :class="{'active': (u.id == activeUser)}" @click="changeUser(u.id)">{{u.name}}</button>
+      </div>
+    </div>
 
-<div class="row marketing">
-  <div class="col-lg-6">
-    <h4>Resources</h4>
-    <ul>
-      <li>
-        <a href="http://phoenixframework.org/docs/overview">Guides</a>
-      </li>
-      <li>
-        <a href="https://hexdocs.pm/phoenix">Docs</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix">Source</a>
-      </li>
-    </ul>
-  </div>
+    <div class="row">
+      <div class="four columns">
+        <button class="twelve column button-secondary" @click="addNewQuestion()">Add New Question</button>
+        <input class="u-full-width" type="text" v-model="searchText" placeholder="Search Questions">
+        <ul class="container-list">
+          <li v-for="q in questionDB | filterBy searchText" >
+            <a href="javascript:void(0)"
+               :class="{'active': (q.QuestionID == formData.QuestionID)}"
+               class="list-link" 
+               @click="editQuestion(q)">{{q.QuestionText}}</a>
+          </li>
+        </ul>
+      </div>
+      <div class="eight columns">
+        <label for="">Question</label>
+        <div class="row" style="padding: 5px">
+          <textarea class="eight columns" v-model="formData.QuestionText"></textarea>
+          <button class=" four columns button-secondary" @click="saveQuestion()">Save Question</button>
+        </div>
+        <div class="row">
 
-  <div class="col-lg-6">
-    <h4>Help</h4>
-    <ul>
-      <li>
-        <a href="http://groups.google.com/group/phoenix-talk">Mailing list</a>
-      </li>
-      <li>
-        <a href="http://webchat.freenode.net/?channels=elixir-lang">#elixir-lang on freenode IRC</a>
-      </li>
-      <li>
-        <a href="https://twitter.com/elixirphoenix">@elixirphoenix</a>
-      </li>
-    </ul>
+          <div class="six columns">
+            <ul>
+              <li v-for="a in getQuestionAnswers() | orderBy 'AnswerText'" >
+                <span class="text-block">{{a.AnswerText}}</span>
+                <span class="count">{{a.AnswerVotes}}</span>
+                <a href="javascript:void(0)" @click="toggleVote(a)" class="icon-list-block"><i :class="checkVote(a)" class="fa-heart"></i></a>
+                <a href="javascript:void(0)" @click="deleteAnswer(a)" class="icon-list-block"><i class="fas fa-times-circle"></i></a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="six columns" v-show="formData.QuestionID > 0">
+
+            <label>Answer: </label>
+            <input type="text" v-model="formData.AnswerText"  @keyup.enter="addAnswer()">
+            <button class="button-primary" @click="addAnswer()">Add Answer</button>
+
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
