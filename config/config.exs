@@ -14,8 +14,7 @@ config :feud, FeudWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "Q+AG+XirTvylea/l+vhcFsr9jmezy/p8GE/Pq1Uop14zit1qCjcKzu/GtUrEzviR",
   render_errors: [view: FeudWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Feud.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Feud.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -24,4 +23,4 @@ config :logger, :console,
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"

@@ -28,8 +28,9 @@ defmodule FeudWeb do
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/feud_web/templates",
-                        namespace: FeudWeb
+      use Phoenix.View,
+        root: "lib/feud_web/templates",
+        namespace: FeudWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 2, view_module: 1]
