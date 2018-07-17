@@ -24,7 +24,6 @@ Vue.use(VueResource)
 
 // import socket from "./socket"
 
-console.log('loaded')
 feud_vue = new Vue({
   el: "#feud_admin",
   data: {
@@ -40,22 +39,22 @@ feud_vue = new Vue({
     searchText: "",
     idxQuestions: {},
     formData: {
-      QuestionID: 0,
-      QuestionText: "",
-      AnswerText: ""
+      id: 0,
+      text: "",
+      answer: ""
     },
     upvotedAnswers: []
   },
   http: {},
   created: function() {
-    console.log("created app")
+    console.log("Created App")
     var _self = this;
     this.changeUser(1);
     this.idxQuestions = {};
-    this.$http.get("http://localhost:3000/questions").then(function(res) {
-      _self.questionDB = res.body;
-      _self.questionDB.forEach(function(q, i) {
-        _self.idxQuestions[q.QuestionID] = q;
+    this.$http.get("/api/questions").then(function(res) {
+      _self.questionDB = res.body.data;
+      _.forEach(_self.questionDB, function(q, i) {
+        _self.idxQuestions[q.id] = q;
       });
     });
   },
@@ -67,45 +66,48 @@ feud_vue = new Vue({
     getUserVotes: function() {
       var _self = this;
       this.$http
-        .post("http://localhost:3000/uservotes", { userID: this.activeUser })
+        .post("/api/votes", { userID: this.activeUser })
         .then(function(res) {
           console.log(res);
           _self.upvotedAnswers = res.body;
         });
     },
     checkVote: function(answer) {
-      return this.upvotedAnswers.indexOf(answer.AnswerID) != -1 ? "fas" : "far";
+      return this.upvotedAnswers.indexOf(answer.id) != -1 ? "fas" : "far";
     },
     addNewQuestion: function () {
 
-      this.formData.QuestionID = 0;
-      this.formData.QuestionText = "";
-      this.formData.AnswerText = "";
+      this.formData.id = 0;
+      this.formData.text = "";
+      this.formData.answer = "";
     },
     editQuestion: function(question) {
-      this.formData.QuestionID = question.QuestionID;
-      this.formData.QuestionText = question.QuestionText;
-      this.formData.AnswerText = "";
+      this.formData.id = question.id;
+      this.formData.text = question.text;
+      this.formData.answer = "";
     },
     saveQuestion: function() {
       var _self = this;
       this.$http
-        .post("http://localhost:3000/question", {
-          questionID: this.formData.QuestionID,
-          questionText: this.formData.QuestionText,
-          userID: this.activeUser
+        .post("/api/questions", {
+          question:{
+            id: this.formData.id,
+            text: this.formData.text,
+            user_id: this.activeUser
+          }
         })
         .then(function(res) {
-          var result = res.body[0];
+          console.log(res)
+          var result = res.body;
           console.log(result);
-          if (_self.idxQuestions.hasOwnProperty(result.QuestionID)){
+          if (_self.idxQuestions.hasOwnProperty(result.data.id)){
             for (var i in result) {
-              _self.idxQuestions[result.QuestionID][i] = result[i];
+              _self.idxQuestions[result.data.id][i] = result.data;
             }
           } else {
-            _self.questionDB.push(result);
+            _self.questionDB.push(result.data);
             var question = _self.questionDB[_self.questionDB.length-1];
-            _self.idxQuestions[result.QuestionID] = question;
+            _self.idxQuestions[result.data.id] = question;
             _self.editQuestion(question);
 
           }
@@ -120,7 +122,7 @@ feud_vue = new Vue({
       if (this.formData.AnswerText == "") return false;
       var _self = this;
       this.$http
-        .post("http://localhost:3000/answer", {
+        .post("/api/answer", {
           questionID: this.formData.QuestionID,
           answerText: this.formData.AnswerText,
           userID: this.activeUser
@@ -138,7 +140,7 @@ feud_vue = new Vue({
       var wasUpvoted = this.upvotedAnswers.indexOf(answer.AnswerID) != -1;
       var endpoint = wasUpvoted ? "unvote" : "vote";
       this.$http
-        .post("http://localhost:3000/" + endpoint, {
+        .post("/api/" + endpoint, {
           answerID: answer.AnswerID,
           userID: this.activeUser
         })

@@ -14,6 +14,6 @@ defmodule Feud.Questions.Question do
   def changeset(question, attrs) do
     question
     |> cast(attrs, [:text, :delete_date, :user_id])
-    |> validate_required([:text, :delete_date, :user_id])
+    |> validate_required([:text, :user_id])
   end
 end
