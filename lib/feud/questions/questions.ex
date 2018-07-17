@@ -152,9 +152,11 @@ defmodule Feud.Questions do
 
   """
   def create_answer(attrs \\ %{}) do
-    %Answer{}
-    |> Answer.changeset(attrs)
-    |> Repo.insert()
+    with {:ok, answer} <- %Answer{} |> Answer.changeset(attrs) |> Repo.insert() do
+      create_vote(%{user_id: answer.user_id, answer_id: answer.id})
+
+      {:ok, answer}
+    end
   end
 
   @doc """
@@ -202,5 +204,116 @@ defmodule Feud.Questions do
   """
   def change_answer(%Answer{} = answer) do
     Answer.changeset(answer, %{})
+  end
+
+  alias Feud.Questions.Vote
+
+  @doc """
+  Returns the list of votes.
+
+  ## Examples
+
+      iex> list_votes()
+      [%Vote{}, ...]
+
+  """
+  def list_votes_for_user(user_id) do
+    query = from(v in Vote, where: v.user_id == ^user_id)
+    Repo.all(query)
+  end
+
+  @doc """
+  Gets a single vote.
+
+  Raises `Ecto.NoResultsError` if the Vote does not exist.
+
+  ## Examples
+
+      iex> get_vote!(123, 456)
+      %Vote{}
+
+      iex> get_vote!(456, 123)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_vote!(answer_id, user_id) do
+    query = from(v in Vote, where: v.answer_id == ^answer_id and v.user_id == ^user_id)
+    Repo.one!(query)
+  end
+
+  def get_all_votes_for_answer(%Answer{} = answer) do
+    query = from(v in Vote, where: v.answer_id == ^answer.id)
+    Repo.all(query)
+  end
+
+  @doc """
+  Creates a vote.
+
+  ## Examples
+
+      iex> create_vote(%{field: value})
+      {:ok, %Vote{}}
+
+      iex> create_vote(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_vote(attrs \\ %{}) do
+    with {:ok, vote} <- %Vote{} |> Vote.changeset(attrs) |> Repo.insert() do
+      answer = get_answer!(attrs["answer_id"])
+      vote_count = get_all_votes_for_answer(answer) |> length()
+      answer |> Answer.changeset(%{vote_count: vote_count}) |> Repo.update()
+    end
+  end
+
+  @doc """
+  Updates a vote.
+
+  ## Examples
+
+      iex> update_vote(vote, %{field: new_value})
+      {:ok, %Vote{}}
+
+      iex> update_vote(vote, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_vote(%Vote{} = vote, attrs) do
+    vote
+    |> Vote.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a Vote.
+
+  ## Examples
+
+      iex> delete_vote(vote)
+      {:ok, %Vote{}}
+
+      iex> delete_vote(vote)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_vote(%Vote{} = vote) do
+    answer = get_answer!(vote.answer_id)
+    Repo.delete(vote)
+
+    vote_count = get_all_votes_for_answer(answer) |> length()
+    answer |> Answer.changeset(%{vote_count: vote_count}) |> Repo.update()
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking vote changes.
+
+  ## Examples
+
+      iex> change_vote(vote)
+      %Ecto.Changeset{source: %Vote{}}
+
+  """
+  def change_vote(%Vote{} = vote) do
+    Vote.changeset(vote, %{})
   end
 end

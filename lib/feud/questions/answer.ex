@@ -6,7 +6,7 @@ defmodule Feud.Questions.Answer do
     field(:delete_date, :naive_datetime)
     field(:text, :string)
     field(:user_id, :integer)
-    field(:vote_count, :integer, default: 1)
+    field(:vote_count, :integer, default: 0)
     field(:question_id, :id)
 
     timestamps()

@@ -67,10 +67,10 @@ feud_vue = new Vue({
     getUserVotes: function() {
       var _self = this;
       this.$http
-        .post("/api/votes", { userID: this.activeUser })
+        .post("/api/votes", { user_id: this.activeUser })
         .then(function(res) {
           console.log(res);
-          _self.upvotedAnswers = res.body;
+          _self.upvotedAnswers = res.body.data;
         });
     },
     checkVote: function(answer) {
@@ -137,25 +137,27 @@ feud_vue = new Vue({
         });
     },
     toggleVote: function(answer) {
+      console.log(answer)
       var _self = this;
       var wasUpvoted = this.upvotedAnswers.indexOf(answer.id) != -1;
       var endpoint = wasUpvoted ? "unvote" : "vote";
       this.$http
         .post("/api/" + endpoint, {
-          answer_id: answer.id,
-          userID: this.activeUser
+          vote: {
+            answer_id: answer.id,
+            user_id: this.activeUser
+          }
         })
         .then(function(res) {
-          var result = res.body;
-          console.log(result);
+          var result = res.body.data;
           for (var i in result) {
             answer[i] = result[i];
           }
 
           if (wasUpvoted) {
-            _self.upvotedAnswers.splice(_self.upvotedAnswers.indexOf(answer.id),1);
+            _self.upvotedAnswers.splice(_self.upvotedAnswers.indexOf(result.id),1);
           } else {  
-            _self.upvotedAnswers.push(answer.id)
+            _self.upvotedAnswers.push(result.id)
           }
         });
     }

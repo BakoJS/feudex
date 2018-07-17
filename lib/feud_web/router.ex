@@ -25,5 +25,8 @@ defmodule FeudWeb.Router do
     pipe_through(:api)
     resources("/questions", QuestionController, except: [:new, :edit])
     resources("/answers", AnswerController, except: [:new, :edit])
+    post("/unvote", VoteController, :delete)
+    post("/vote", VoteController, :create)
+    post("/votes", VoteController, :index)
   end
 end
