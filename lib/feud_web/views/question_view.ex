@@ -1,6 +1,7 @@
 defmodule FeudWeb.QuestionView do
   use FeudWeb, :view
   alias FeudWeb.QuestionView
+  alias FeudWeb.AnswerView
 
   def render("index.json", %{questions: questions}) do
     %{data: render_many(questions, QuestionView, "question.json")}
@@ -15,7 +16,8 @@ defmodule FeudWeb.QuestionView do
       id: question.id,
       text: question.text,
       delete_date: question.delete_date,
-      user_id: question.user_id
+      user_id: question.user_id,
+      answers: render_many(question.answers, AnswerView, "answer.json")
     }
   end
 end

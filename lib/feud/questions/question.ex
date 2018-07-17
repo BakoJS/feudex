@@ -2,10 +2,13 @@ defmodule Feud.Questions.Question do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Feud.Questions.Answer
+
   schema "questions" do
     field(:delete_date, :naive_datetime)
     field(:text, :string)
     field(:user_id, :integer)
+    has_many(:answers, Answer)
 
     timestamps()
   end

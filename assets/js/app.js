@@ -14,6 +14,7 @@
 import "phoenix_html"
 import Vue from "vue"
 import VueResource from 'vue-resource'
+import _ from 'underscore'
 
 Vue.use(VueResource)
 
@@ -97,9 +98,7 @@ feud_vue = new Vue({
           }
         })
         .then(function(res) {
-          console.log(res)
           var result = res.body;
-          console.log(result);
           if (_self.idxQuestions.hasOwnProperty(result.data.id)){
             for (var i in result) {
               _self.idxQuestions[result.data.id][i] = result.data;
@@ -114,34 +113,36 @@ feud_vue = new Vue({
         });
     },
     getQuestionAnswers: function() {
-      if (this.idxQuestions.hasOwnProperty(this.formData.QuestionID))
-        return this.idxQuestions[this.formData.QuestionID].Answers;
+      if (this.idxQuestions.hasOwnProperty(this.formData.id))
+        return this.idxQuestions[this.formData.id].answers;
       return [];
     },
     addAnswer: function() {
-      if (this.formData.AnswerText == "") return false;
+      if (this.formData.text == "") return false;
       var _self = this;
       this.$http
-        .post("/api/answer", {
-          questionID: this.formData.QuestionID,
-          answerText: this.formData.AnswerText,
-          userID: this.activeUser
+        .post("/api/answers", {
+          answer: {
+            question_id: this.formData.id,
+            text: this.formData.answer,
+            user_id: this.activeUser
+          }
         })
         .then(function(res) {
-          var result = res.body;
+          var result = res.body.data;
 
-          _self.idxQuestions[_self.formData.QuestionID]["Answers"].push(result);
-          _self.upvotedAnswers.push(result.AnswerID);
-          _self.formData.AnswerText = "";
+          _self.idxQuestions[_self.formData.id]["answers"].push(result);
+          _self.upvotedAnswers.push(result.id);
+          _self.formData.answer = "";
         });
     },
     toggleVote: function(answer) {
       var _self = this;
-      var wasUpvoted = this.upvotedAnswers.indexOf(answer.AnswerID) != -1;
+      var wasUpvoted = this.upvotedAnswers.indexOf(answer.id) != -1;
       var endpoint = wasUpvoted ? "unvote" : "vote";
       this.$http
         .post("/api/" + endpoint, {
-          answerID: answer.AnswerID,
+          answer_id: answer.id,
           userID: this.activeUser
         })
         .then(function(res) {
@@ -152,9 +153,9 @@ feud_vue = new Vue({
           }
 
           if (wasUpvoted) {
-            _self.upvotedAnswers.splice(_self.upvotedAnswers.indexOf(answer.AnswerID),1);
+            _self.upvotedAnswers.splice(_self.upvotedAnswers.indexOf(answer.id),1);
           } else {  
-            _self.upvotedAnswers.push(answer.AnswerID)
+            _self.upvotedAnswers.push(answer.id)
           }
         });
     }

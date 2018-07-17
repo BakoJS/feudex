@@ -9,5 +9,7 @@ defmodule Feud.Repo.Migrations.CreateQuestions do
 
       timestamps()
     end
+
+    create(index(:questions, [:user_id]))
   end
 end

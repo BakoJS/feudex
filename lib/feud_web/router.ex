@@ -24,5 +24,6 @@ defmodule FeudWeb.Router do
   scope "/api", FeudWeb do
     pipe_through(:api)
     resources("/questions", QuestionController, except: [:new, :edit])
+    resources("/answers", AnswerController, except: [:new, :edit])
   end
 end

@@ -31,8 +31,8 @@
           <div class="six columns">
             <ul>
               <li v-for="a in getQuestionAnswers() | orderBy 'answer'" >
-                <span class="text-block">{{a.answer}}</span>
-                <span class="count">{{a.AnswerVotes}}</span>
+                <span class="text-block">{{a.text}}</span>
+                <span class="count">{{a.vote_count}}</span>
                 <a href="javascript:void(0)" @click="toggleVote(a)" class="icon-list-block"><i :class="checkVote(a)" class="fa-heart"></i></a>
                 <a href="javascript:void(0)" @click="deleteAnswer(a)" class="icon-list-block"><i class="fas fa-times-circle"></i></a>
               </li>

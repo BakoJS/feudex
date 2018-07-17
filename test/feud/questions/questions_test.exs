@@ -70,4 +70,70 @@ defmodule Feud.QuestionsTest do
       assert %Ecto.Changeset{} = Questions.change_question(question)
     end
   end
+
+  describe "answers" do
+    alias Feud.Questions.Answer
+
+    @valid_attrs %{delete_date: ~N[2010-04-17 14:00:00.000000], text: "some text", user_id: 42, votes: 42}
+    @update_attrs %{delete_date: ~N[2011-05-18 15:01:01.000000], text: "some updated text", user_id: 43, votes: 43}
+    @invalid_attrs %{delete_date: nil, text: nil, user_id: nil, votes: nil}
+
+    def answer_fixture(attrs \\ %{}) do
+      {:ok, answer} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Questions.create_answer()
+
+      answer
+    end
+
+    test "list_answers/0 returns all answers" do
+      answer = answer_fixture()
+      assert Questions.list_answers() == [answer]
+    end
+
+    test "get_answer!/1 returns the answer with given id" do
+      answer = answer_fixture()
+      assert Questions.get_answer!(answer.id) == answer
+    end
+
+    test "create_answer/1 with valid data creates a answer" do
+      assert {:ok, %Answer{} = answer} = Questions.create_answer(@valid_attrs)
+      assert answer.delete_date == ~N[2010-04-17 14:00:00.000000]
+      assert answer.text == "some text"
+      assert answer.user_id == 42
+      assert answer.votes == 42
+    end
+
+    test "create_answer/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Questions.create_answer(@invalid_attrs)
+    end
+
+    test "update_answer/2 with valid data updates the answer" do
+      answer = answer_fixture()
+      assert {:ok, answer} = Questions.update_answer(answer, @update_attrs)
+      assert %Answer{} = answer
+      assert answer.delete_date == ~N[2011-05-18 15:01:01.000000]
+      assert answer.text == "some updated text"
+      assert answer.user_id == 43
+      assert answer.votes == 43
+    end
+
+    test "update_answer/2 with invalid data returns error changeset" do
+      answer = answer_fixture()
+      assert {:error, %Ecto.Changeset{}} = Questions.update_answer(answer, @invalid_attrs)
+      assert answer == Questions.get_answer!(answer.id)
+    end
+
+    test "delete_answer/1 deletes the answer" do
+      answer = answer_fixture()
+      assert {:ok, %Answer{}} = Questions.delete_answer(answer)
+      assert_raise Ecto.NoResultsError, fn -> Questions.get_answer!(answer.id) end
+    end
+
+    test "change_answer/1 returns a answer changeset" do
+      answer = answer_fixture()
+      assert %Ecto.Changeset{} = Questions.change_answer(answer)
+    end
+  end
 end
