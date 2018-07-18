@@ -74,8 +74,18 @@ defmodule Feud.QuestionsTest do
   describe "answers" do
     alias Feud.Questions.Answer
 
-    @valid_attrs %{delete_date: ~N[2010-04-17 14:00:00.000000], text: "some text", user_id: 42, votes: 42}
-    @update_attrs %{delete_date: ~N[2011-05-18 15:01:01.000000], text: "some updated text", user_id: 43, votes: 43}
+    @valid_attrs %{
+      delete_date: ~N[2010-04-17 14:00:00.000000],
+      text: "some text",
+      user_id: 42,
+      votes: 42
+    }
+    @update_attrs %{
+      delete_date: ~N[2011-05-18 15:01:01.000000],
+      text: "some updated text",
+      user_id: 43,
+      votes: 43
+    }
     @invalid_attrs %{delete_date: nil, text: nil, user_id: nil, votes: nil}
 
     def answer_fixture(attrs \\ %{}) do

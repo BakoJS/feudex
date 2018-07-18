@@ -154,8 +154,6 @@ defmodule Feud.Questions do
   def create_answer(attrs \\ %{}) do
     with {:ok, answer} <- %Answer{} |> Answer.changeset(attrs) |> Repo.insert() do
       create_vote(%{user_id: answer.user_id, answer_id: answer.id})
-
-      {:ok, answer}
     end
   end
 
@@ -260,7 +258,7 @@ defmodule Feud.Questions do
   """
   def create_vote(attrs \\ %{}) do
     with {:ok, vote} <- %Vote{} |> Vote.changeset(attrs) |> Repo.insert() do
-      answer = get_answer!(attrs["answer_id"])
+      answer = get_answer!(attrs["answer_id"] || attrs[:answer_id])
       vote_count = get_all_votes_for_answer(answer) |> length()
       answer |> Answer.changeset(%{vote_count: vote_count}) |> Repo.update()
     end
